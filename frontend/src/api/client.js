@@ -8,6 +8,30 @@ const client = axios.create({
   timeout: 15000,
 });
 
+// ── Helper: fully wipe auth state and go to login ────────────
+function forceLogout() {
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('user');
+  // Only redirect if not already on an auth page
+  if (!window.location.pathname.startsWith('/login') &&
+      !window.location.pathname.startsWith('/register')) {
+    window.location.href = '/login';
+  }
+}
+
+// ── Helper: check if a JWT is expired (client-side, no library) ──
+export function isTokenExpired(token) {
+  if (!token) return true;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    // exp is in seconds, Date.now() is ms
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true; // malformed token → treat as expired
+  }
+}
+
 // ── Request interceptor: attach JWT ─────────────────────────
 client.interceptors.request.use(
   (config) => {
@@ -29,21 +53,22 @@ client.interceptors.response.use(
       original._retry = true;
       const refreshToken = localStorage.getItem('refreshToken');
 
-      if (refreshToken) {
-        try {
-          const res = await axios.post(`${API_URL}/auth/refresh`, { refreshToken });
-          const { accessToken } = res.data.data;
-          localStorage.setItem('accessToken', accessToken);
-          original.headers.Authorization = `Bearer ${accessToken}`;
-          return client(original);
-        } catch (_) {
-          // Refresh failed — clear storage and redirect to login
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          window.location.href = '/login';
-        }
-      } else {
-        window.location.href = '/login';
+      // If refresh token is also expired, logout immediately — no point calling API
+      if (!refreshToken || isTokenExpired(refreshToken)) {
+        forceLogout();
+        return Promise.reject(error);
+      }
+
+      try {
+        const res = await axios.post(`${API_URL}/auth/refresh`, { refreshToken });
+        const { accessToken, refreshToken: newRefresh } = res.data.data;
+        localStorage.setItem('accessToken', accessToken);
+        if (newRefresh) localStorage.setItem('refreshToken', newRefresh);
+        original.headers.Authorization = `Bearer ${accessToken}`;
+        return client(original);
+      } catch {
+        // Refresh also failed (server-side invalid) — force logout
+        forceLogout();
       }
     }
 

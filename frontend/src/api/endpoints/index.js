@@ -62,9 +62,11 @@ export const purchaseOrdersAPI = {
 };
 
 export const forecastsAPI = {
-  generate: ()   => client.post('/forecasts/generate'),
-  getAll:   ()   => client.get('/forecasts'),
-  getByProduct: (productId) => client.get(`/forecasts/${productId}`),
+  generate:     ()           => client.post('/forecasts/generate'),
+  getAll:       ()           => client.get('/forecasts'),
+  getByProduct: (productId)  => client.get(`/forecasts/${productId}`),
+  reorderList:  ()           => client.get('/forecasts/reorder-list'),
+  ask:          (question)   => client.post('/forecasts/ask', { question }),
 };
 
 export const whatsappAPI = {

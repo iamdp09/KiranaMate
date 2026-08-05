@@ -27,13 +27,21 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!storeName.trim()) return toast.error('Store name is required');
     setLoading(true);
     try {
-      await register({ name, email, password, phone, storeName, storeAddress: storeAddr });
+      await register({ name, email, password, phone, storeName: storeName.trim(), storeAddress: storeAddr.trim() });
       toast.success('Account created! Welcome to KiranaAI');
       navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Registration failed');
+      // Show specific field errors from backend validation
+      const data = err.response?.data;
+      if (data?.errors) {
+        const firstError = Object.values(data.errors)[0];
+        toast.error(firstError || data.message || 'Registration failed');
+      } else {
+        toast.error(data?.message || 'Registration failed. Please try again.');
+      }
     } finally { setLoading(false); }
   };
 

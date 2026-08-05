@@ -19,8 +19,12 @@ app:
     refresh-token-expiry: ${JWT_REFRESH_EXPIRY:604800000}  # 7 days in ms
   otp:
     expiry-minutes: 5
+  gemini:
+    api-key: ${GEMINI_API_KEY:}
+    model: ${GEMINI_MODEL:gemini-2.5-flash-lite}
+    base-url: https://generativelanguage.googleapis.com/v1beta/models
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,http://localhost:3000}
 
 # Twilio WhatsApp Configuration
 twilio:

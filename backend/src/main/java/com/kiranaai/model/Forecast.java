@@ -29,6 +29,7 @@ public class Forecast {
     private Double predictedDemand;
     private Double recommendedReorder;
     private Double confidence;
+    private String aiReasoning;   // Gemini's explanation
 
     private Instant generatedAt;
 }

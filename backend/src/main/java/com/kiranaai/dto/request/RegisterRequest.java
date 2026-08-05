@@ -9,6 +9,6 @@ public record RegisterRequest(
         @NotBlank @Email String email,
         @NotBlank @Size(min = 6) String password,
         @NotBlank String phone,
-        @NotBlank String storeName,
-        String storeAddress
+        String storeName,       // Optional — can be set later in profile
+        String storeAddress     // Optional
 ) {}

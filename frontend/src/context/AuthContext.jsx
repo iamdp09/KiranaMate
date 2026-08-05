@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authAPI } from '../api/endpoints/index';
+import { isTokenExpired } from '../api/client';
 
 const AuthContext = createContext(null);
 
@@ -7,13 +8,25 @@ export function AuthProvider({ children }) {
   const [user, setUser]       = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // On mount — restore session from localStorage
+  // On mount — restore session only if tokens are still valid
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    const saved  = localStorage.getItem('user');
-    if (token && saved) {
+    const accessToken  = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
+    const saved        = localStorage.getItem('user');
+
+    // If both tokens are expired, wipe everything and start clean
+    if (isTokenExpired(accessToken) && isTokenExpired(refreshToken)) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      setLoading(false);
+      return;
+    }
+
+    // At least one token is valid — restore the user from localStorage
+    if (saved) {
       try { setUser(JSON.parse(saved)); }
-      catch { /* ignore */ }
+      catch { /* corrupted data — ignore */ }
     }
     setLoading(false);
   }, []);
