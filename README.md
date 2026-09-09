@@ -1,124 +1,262 @@
-<<<<<<< HEAD
 # 🛒 KiranaAI — AI-Powered Inventory Management System
 
 > Final Year College Project | AI + Web Development
 
-KiranaAI is a full-stack web application that helps small kirana (grocery) stores manage inventory, record daily sales, predict future demand using AI/ML, and automate reorder workflows through WhatsApp.
+KiranaAI is a full-stack inventory management system designed for small **kirana (grocery) stores**. It helps store owners manage products, track inventory, record daily sales, predict future demand using AI/ML, manage suppliers and purchase orders, and automate stock alerts through WhatsApp.
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Key Features
 
-### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- MongoDB (local or Atlas)
+* 📦 **Product & SKU Management** — Add, update, delete, and manage products
+* 📊 **Inventory Management** — Track current stock and reorder thresholds
+* 💰 **Sales Management** — Record and analyze daily sales
+* 🤖 **AI-Based Demand Forecasting** — Predict future product demand
+* 🔔 **Smart Reorder Alerts** — Identify products that need replenishment
+* 🧾 **Purchase Order Management** — Create and track supplier orders
+* 👨‍💼 **Supplier Management** — Maintain supplier information
+* 📱 **WhatsApp Integration** — Send inventory and reorder alerts through WhatsApp
+* 🔐 **JWT Authentication** — Secure user authentication and authorization
+* 📈 **Dashboard & Analytics** — View inventory, sales, and forecasting insights
 
 ---
 
-### 1. Start MongoDB
+# 🏗️ System Architecture
+
+```text
+                    ┌─────────────────────┐
+                    │      React UI       │
+                    │   React + Vite      │
+                    └──────────┬──────────┘
+                               │
+                          REST APIs
+                               │
+                    ┌──────────▼──────────┐
+                    │   Spring Boot API   │
+                    │       Backend       │
+                    └──────────┬──────────┘
+                               │
+              ┌────────────────┼────────────────┐
+              │                │                │
+       ┌──────▼─────┐   ┌──────▼─────┐  ┌──────▼──────┐
+       │  MongoDB   │   │ AI/ML Layer │  │   Twilio    │
+       │  Database  │   │ Forecasting │  │  WhatsApp   │
+       └────────────┘   └─────────────┘  └─────────────┘
+```
+
+---
+
+# 🚀 Quick Start
+
+## Prerequisites
+
+Make sure the following are installed:
+
+* **Java 17+**
+* **Maven 3.8+**
+* **Node.js 18+**
+* **MongoDB** (Local or MongoDB Atlas)
+* Git
+
+---
+
+# 1. Start MongoDB
+
+### Local MongoDB
 
 ```bash
-# If using local MongoDB:
 mongod --dbpath C:/data/db
 ```
 
-Or use [MongoDB Atlas](https://www.mongodb.com/atlas) (free tier).
+Or use **MongoDB Atlas** and configure the connection string in the backend `.env`/application configuration.
 
 ---
 
-### 2. Setup Backend
+# 2. Setup Backend
+
+Navigate to the backend:
 
 ```bash
 cd backend
-
-# Create and activate virtual environment
-python -m venv venv
-venv\Scripts\activate          # Windows
-# source venv/bin/activate     # Mac/Linux
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Copy environment file
-copy .env.example .env
-# Edit .env with your MongoDB URL if using Atlas
-
-# Seed demo data (optional but recommended)
-python seed_data.py
-
-# Start the API server
-uvicorn app.main:app --reload --port 8000
 ```
 
-API will be available at: http://localhost:8000  
-Swagger docs at: http://localhost:8000/docs
+Build the Spring Boot application:
+
+```bash
+mvn clean install
+```
+
+Run the application:
+
+```bash
+mvn spring-boot:run
+```
+
+Alternatively, run the generated JAR:
+
+```bash
+java -jar target/kirana-ai-0.0.1-SNAPSHOT.jar
+```
+
+The backend will be available at:
+
+```text
+http://localhost:8080
+```
 
 ---
 
-### 3. Setup Frontend
+# 3. Configure Backend
+
+Update:
+
+```text
+backend/src/main/resources/application.properties
+```
+
+Example configuration:
+
+```properties
+spring.application.name=kirana-ai
+
+server.port=8080
+
+spring.data.mongodb.uri=mongodb://localhost:27017/kirana_ai
+spring.data.mongodb.database=kirana_ai
+
+# JWT
+jwt.secret=your-secret-key
+jwt.expiration=86400000
+
+# Twilio
+twilio.account-sid=ACxxxxxxxxxxxxxxxxxxxxxxxx
+twilio.auth-token=xxxxxxxxxxxxxxxxxxxxxxxx
+twilio.whatsapp-from=whatsapp:+14155238886
+```
+
+> For production, sensitive credentials should be provided through environment variables rather than committed to Git.
+
+---
+
+# 4. Setup Frontend
+
+Navigate to the frontend:
 
 ```bash
 cd frontend
+```
+
+Install dependencies:
+
+```bash
 npm install
+```
+
+Start the development server:
+
+```bash
 npm run dev
 ```
 
-Frontend will run at: http://localhost:5173
+Frontend will run at:
+
+```text
+http://localhost:5173
+```
 
 ---
 
-### 4. Demo Login
+# 5. Demo Login
 
-```
+```text
 Email:    demo@kiranaai.com
 Password: demo123
 ```
 
 ---
 
-## 📁 Project Structure
+# 📁 Project Structure
 
-```
+```text
 KiranaAI/
+│
 ├── backend/
-│   ├── app/
-│   │   ├── api/            # Route handlers
-│   │   │   ├── auth.py
-│   │   │   ├── products.py
-│   │   │   ├── suppliers.py
-│   │   │   ├── inventory.py
-│   │   │   ├── sales.py
-│   │   │   ├── forecasts.py
-│   │   │   ├── purchase_orders.py
-│   │   │   ├── whatsapp.py
-│   │   │   └── dashboard.py
-│   │   ├── core/
-│   │   │   ├── config.py   # App settings
-│   │   │   └── security.py # JWT + bcrypt
-│   │   ├── db/
-│   │   │   └── database.py # MongoDB connection
-│   │   ├── models/
-│   │   │   └── schemas.py  # Pydantic models
-│   │   ├── services/
-│   │   │   ├── ml_service.py       # AI forecasting
-│   │   │   └── whatsapp_service.py # WhatsApp messaging
-│   │   └── main.py
-│   ├── seed_data.py         # Demo data seeder
-│   ├── requirements.txt
-│   └── .env
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── com/
+│   │   │   │       └── kiranaai/
+│   │   │   │           ├── controller/
+│   │   │   │           │   ├── AuthController.java
+│   │   │   │           │   ├── ProductController.java
+│   │   │   │           │   ├── SupplierController.java
+│   │   │   │           │   ├── InventoryController.java
+│   │   │   │           │   ├── SalesController.java
+│   │   │   │           │   ├── ForecastController.java
+│   │   │   │           │   ├── PurchaseOrderController.java
+│   │   │   │           │   ├── WhatsAppController.java
+│   │   │   │           │   └── DashboardController.java
+│   │   │   │           │
+│   │   │   │           ├── service/
+│   │   │   │           │   ├── AuthService.java
+│   │   │   │           │   ├── ProductService.java
+│   │   │   │           │   ├── InventoryService.java
+│   │   │   │           │   ├── SalesService.java
+│   │   │   │           │   ├── ForecastService.java
+│   │   │   │           │   ├── PurchaseOrderService.java
+│   │   │   │           │   └── WhatsAppService.java
+│   │   │   │           │
+│   │   │   │           ├── repository/
+│   │   │   │           │   ├── UserRepository.java
+│   │   │   │           │   ├── ProductRepository.java
+│   │   │   │           │   ├── SupplierRepository.java
+│   │   │   │           │   ├── InventoryRepository.java
+│   │   │   │           │   ├── SalesRepository.java
+│   │   │   │           │   └── PurchaseOrderRepository.java
+│   │   │   │           │
+│   │   │   │           ├── model/
+│   │   │   │           │   ├── User.java
+│   │   │   │           │   ├── Product.java
+│   │   │   │           │   ├── Supplier.java
+│   │   │   │           │   ├── Inventory.java
+│   │   │   │           │   ├── Sale.java
+│   │   │   │           │   └── PurchaseOrder.java
+│   │   │   │           │
+│   │   │   │           ├── dto/
+│   │   │   │           ├── security/
+│   │   │   │           │   ├── JwtService.java
+│   │   │   │           │   ├── JwtAuthenticationFilter.java
+│   │   │   │           │   └── SecurityConfig.java
+│   │   │   │           │
+│   │   │   │           ├── config/
+│   │   │   │           └── exception/
+│   │   │   │
+│   │   │   └── resources/
+│   │   │       └── application.properties
+│   │   │
+│   │   ├── test/
+│   │   └── pom.xml
+│   │
+│   ├── seed/
+│   │   └── seed-data.json
+│   │
+│   └── README.md
+│
 ├── frontend/
 │   ├── src/
 │   │   ├── api/
-│   │   │   ├── client.js    # Axios base client
-│   │   │   └── endpoints.js # All API calls
+│   │   │   ├── client.js
+│   │   │   └── endpoints.js
+│   │   │
 │   │   ├── components/
 │   │   │   ├── Sidebar.jsx
 │   │   │   ├── Layout.jsx
 │   │   │   ├── Modal.jsx
 │   │   │   └── Badges.jsx
+│   │   │
 │   │   ├── context/
 │   │   │   └── AuthContext.jsx
+│   │   │
 │   │   ├── pages/
 │   │   │   ├── Login.jsx
 │   │   │   ├── Register.jsx
@@ -130,143 +268,331 @@ KiranaAI/
 │   │   │   ├── Forecasts.jsx
 │   │   │   ├── PurchaseOrders.jsx
 │   │   │   └── WhatsApp.jsx
+│   │   │
 │   │   ├── App.jsx
 │   │   ├── main.jsx
 │   │   └── index.css
-│   └── package.json
+│   │
+│   ├── package.json
+│   └── vite.config.js
+│
 └── README.md
 ```
 
 ---
 
-## 🧠 AI/ML Forecasting
+# 🧠 AI/ML Demand Forecasting
 
-The system uses a tiered forecasting approach:
+KiranaAI uses a **tiered demand forecasting approach** depending on the amount of historical sales data available.
 
-| Data Available | Model Used |
-|---|---|
-| < 7 days | Weighted Moving Average |
-| 7–13 days | Linear Regression with day-of-week features |
-| 14+ days | Polynomial Regression with seasonality |
+| Historical Data | Forecasting Approach                     |
+| --------------- | ---------------------------------------- |
+| < 7 days        | Weighted Moving Average                  |
+| 7–13 days       | Linear Regression + Day-of-Week Features |
+| 14+ days        | Polynomial Regression + Seasonality      |
 
-**Reorder Formula:**
+The forecasting service analyzes historical sales to estimate future demand for individual products.
+
+### Reorder Formula
+
+```text
+Reorder Qty =
+max(0, (7-day forecast - current stock) × 1.2)
 ```
-Reorder Qty = max(0, (7-day forecast - current stock) × 1.2)
+
+### Low Stock Alert
+
+An inventory alert is generated when:
+
+```text
+Current Stock < 3-day predicted demand
+        OR
+Current Stock ≤ Reorder Threshold
 ```
 
-**Alert Trigger:**
+---
+
+# 📱 WhatsApp Integration
+
+KiranaAI supports WhatsApp-based inventory alerts using **Twilio WhatsApp API**.
+
+## Demo Mode
+
+The application includes a simulated WhatsApp workflow that can be used without a Twilio account.
+
+This allows the project to be demonstrated locally without requiring external messaging credentials.
+
+## Real Twilio Integration
+
+### 1. Create a Twilio Account
+
+Create a Twilio account and enable the WhatsApp Sandbox.
+
+### 2. Configure Credentials
+
+Add the following environment variables:
+
+```text
+TWILIO_ACCOUNT_SID=ACxxxxxxxx
+TWILIO_AUTH_TOKEN=xxxxxxxx
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
 ```
-Current Stock < 3-day predicted demand  OR  Current Stock ≤ Reorder Threshold
+
+### 3. Expose Local Backend
+
+Using ngrok:
+
+```bash
+ngrok http 8080
+```
+
+### 4. Configure Webhook
+
+Set the Twilio WhatsApp webhook to:
+
+```text
+https://YOUR-NGROK-URL.ngrok.io/api/v1/whatsapp/webhook
 ```
 
 ---
 
-## 📱 WhatsApp Integration
+# 🔌 REST API Endpoints
 
-### Demo Mode (Default)
-The system includes a full simulation at `/whatsapp` page — no Twilio account needed.
-
-### Real Twilio Integration
-1. Create a [Twilio account](https://www.twilio.com/) (free)
-2. Enable WhatsApp Sandbox
-3. Add credentials to `.env`:
-   ```
-   TWILIO_ACCOUNT_SID=ACxxxxxxxx
-   TWILIO_AUTH_TOKEN=xxxxxxxx
-   TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
-   ```
-4. Expose webhook with ngrok:
-   ```bash
-   ngrok http 8000
-   ```
-5. Set webhook URL in Twilio console:
-   ```
-   https://YOUR-NGROK-URL.ngrok.io/api/v1/whatsapp/webhook
-   ```
+| Method | Endpoint                               | Description                        |
+| ------ | -------------------------------------- | ---------------------------------- |
+| POST   | `/api/v1/auth/register`                | Register store owner               |
+| POST   | `/api/v1/auth/login`                   | Authenticate user and generate JWT |
+| GET    | `/api/v1/dashboard/stats`              | Get dashboard statistics           |
+| GET    | `/api/v1/products`                     | Get all products                   |
+| POST   | `/api/v1/products`                     | Add a product                      |
+| GET    | `/api/v1/sales`                        | Get sales history                  |
+| POST   | `/api/v1/sales`                        | Record a sale                      |
+| GET    | `/api/v1/inventory`                    | Get inventory levels               |
+| PATCH  | `/api/v1/inventory/{id}`               | Update stock                       |
+| POST   | `/api/v1/forecasts/generate`           | Generate demand forecast           |
+| GET    | `/api/v1/purchase-orders`              | Get purchase orders                |
+| POST   | `/api/v1/purchase-orders`              | Create purchase order              |
+| PATCH  | `/api/v1/purchase-orders/{id}/deliver` | Mark order as delivered            |
+| POST   | `/api/v1/whatsapp/demo/send-alert`     | Send demo WhatsApp alert           |
 
 ---
 
-## 🔌 Key API Endpoints
+# 🛠️ Technology Stack
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/auth/register` | Register store owner |
-| POST | `/api/v1/auth/login` | Login + get JWT token |
-| GET | `/api/v1/dashboard/stats` | Dashboard aggregate stats |
-| GET/POST | `/api/v1/products` | List / add products |
-| GET/POST | `/api/v1/sales` | View / record daily sales |
-| GET | `/api/v1/inventory` | View stock levels |
-| PATCH | `/api/v1/inventory/{id}` | Update stock level |
-| POST | `/api/v1/forecasts/generate` | Run AI forecast |
-| GET | `/api/v1/purchase-orders` | View purchase orders |
-| PATCH | `/api/v1/purchase-orders/{id}/deliver` | Mark delivered, update stock |
-| POST | `/api/v1/whatsapp/demo/send-alert` | Demo WhatsApp alert |
-
-Full interactive docs at: **http://localhost:8000/docs**
-
----
-
-## 🛠️ Technology Stack
-
-| Layer | Technology |
-|---|---|
-| Frontend | React 18 + Vite + React Router |
-| Styling | Vanilla CSS (custom design system) |
-| Charts | Recharts |
-| Backend | Python FastAPI |
-| Auth | JWT + bcrypt |
-| Database | MongoDB (Motor async driver) |
-| ML/AI | NumPy, Pandas, Scikit-learn |
-| Messaging | Twilio WhatsApp (simulated by default) |
-| Deployment | Vercel (frontend) + Render (backend) |
+| Layer            | Technology                      |
+| ---------------- | ------------------------------- |
+| Frontend         | React 18 + Vite                 |
+| Routing          | React Router                    |
+| Styling          | Vanilla CSS                     |
+| Charts           | Recharts                        |
+| Backend          | **Java 17 + Spring Boot**       |
+| API              | Spring Boot REST API            |
+| Security         | **Spring Security + JWT**       |
+| Password Hashing | BCrypt                          |
+| Database         | **MongoDB**                     |
+| Database Access  | Spring Data MongoDB             |
+| Validation       | Jakarta Bean Validation         |
+| AI/ML            | Forecasting / Regression Models |
+| Messaging        | Twilio WhatsApp API             |
+| Build Tool       | Maven                           |
+| API Testing      | Postman                         |
+| Deployment       | Vercel + Render                 |
 
 ---
 
-## 👥 Team
+# 🔐 Authentication & Security
 
-| Role | Responsibilities |
-|---|---|
-| Frontend Dev | React UI, routing, API integration |
-| Backend Dev | FastAPI, MongoDB, JWT auth |
-| ML Developer | Forecasting models, data preprocessing |
-| Full Stack / DevOps | Integration, deployment, testing |
+KiranaAI uses **JWT-based authentication** with Spring Security.
 
----
+Authentication flow:
 
-## 📊 Demo Data
+```text
+User
+ │
+ │ Login
+ ▼
+Spring Boot API
+ │
+ ├── Validate Credentials
+ │
+ ├── BCrypt Password Verification
+ │
+ └── Generate JWT
+          │
+          ▼
+       Frontend
+          │
+          │ Authorization: Bearer <JWT>
+          ▼
+   Protected REST APIs
+```
 
-After running `python seed_data.py`:
-- **1 store owner** (Ramesh Kumar, Ramesh General Store)
-- **3 suppliers** (Dairy, National Foods, Local FMCG)
-- **15 products** across 5 categories
-- **60 days** of realistic sales history
-- **2 sample purchase orders**
-
----
-
-## 🚀 Deployment
-
-### Backend (Render.com)
-1. Push to GitHub
-2. Create new Web Service on Render
-3. Build command: `pip install -r requirements.txt`
-4. Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-5. Add environment variables
-
-### Frontend (Vercel)
-1. Import GitHub repo
-2. Set `VITE_API_URL=https://your-backend.render.com/api/v1`
-3. Deploy
+Protected endpoints require a valid JWT token.
 
 ---
 
-## 📚 Documentation
+# 📊 Demo Data
 
-- Project Report: `../KiranaAI_Project_Report.md`
-- API Docs: http://localhost:8000/docs (Swagger UI)
+The application can be populated with sample data for demonstration purposes.
+
+Demo dataset includes:
+
+* **1 store owner**
+
+  * Ramesh Kumar
+  * Ramesh General Store
+* **3 suppliers**
+
+  * Dairy Supplier
+  * National Foods
+  * Local FMCG
+* **15 products**
+* **5 product categories**
+* **60 days of sales history**
+* **2 sample purchase orders**
+
+The historical sales data is used by the forecasting module to generate demand predictions.
 
 ---
 
-=======
-# Kirana-AI
->>>>>>> 96beac8049981761351dafc07aafc554a29c0859
+# 🧪 Testing
+
+Backend tests can be executed using Maven:
+
+```bash
+cd backend
+
+mvn test
+```
+
+API endpoints can be tested using:
+
+* Postman
+* Swagger/OpenAPI
+* Browser for GET endpoints
+
+---
+
+# 🚀 Deployment
+
+## Backend — Render
+
+1. Push the project to GitHub.
+2. Create a new **Web Service** on Render.
+3. Select the backend directory.
+4. Configure the build command:
+
+```bash
+mvn clean package -DskipTests
+```
+
+5. Configure the start command:
+
+```bash
+java -jar target/kirana-ai-0.0.1-SNAPSHOT.jar
+```
+
+6. Add environment variables:
+
+```text
+MONGODB_URI=your-mongodb-atlas-uri
+JWT_SECRET=your-jwt-secret
+TWILIO_ACCOUNT_SID=your-account-sid
+TWILIO_AUTH_TOKEN=your-auth-token
+TWILIO_WHATSAPP_FROM=your-whatsapp-number
+```
+
+---
+
+## Frontend — Vercel
+
+1. Import the GitHub repository into Vercel.
+2. Select the `frontend` directory.
+3. Install dependencies:
+
+```bash
+npm install
+```
+
+4. Build the application:
+
+```bash
+npm run build
+```
+
+5. Configure the backend API URL:
+
+```text
+VITE_API_URL=https://your-backend.onrender.com/api/v1
+```
+
+6. Deploy.
+
+---
+
+# 📚 Documentation
+
+Project documentation:
+
+```text
+KiranaAI_Project_Report.md
+```
+
+API documentation can be accessed through the configured Swagger/OpenAPI endpoint when enabled.
+
+---
+
+| Role                | Responsibilities                                    |
+| ------------------- | --------------------------------------------------- |
+| Frontend Developer  | React UI, routing, API integration                  |
+| Backend Developer   | Spring Boot, REST APIs, MongoDB, JWT authentication |
+| ML Developer        | Forecasting models and data preprocessing           |
+| Full Stack / DevOps | Integration, testing and deployment                 |
+
+---
+
+# 🎯 Project Objective
+
+The primary objective of KiranaAI is to help small grocery stores make **data-driven inventory decisions** without requiring complex enterprise inventory software.
+
+By combining:
+
+```text
+Sales Data
+     ↓
+Inventory Tracking
+     ↓
+Demand Forecasting
+     ↓
+Low-Stock Detection
+     ↓
+Reorder Recommendation
+     ↓
+Purchase Order
+     ↓
+WhatsApp Notification
+```
+
+KiranaAI provides a simple workflow for managing inventory and reducing both **stock-outs** and **overstocking**.
+
+---
+
+## ⭐ Future Enhancements
+
+* Advanced time-series forecasting using LSTM/Prophet
+* Automated purchase-order generation
+* Supplier price comparison
+* Multi-store management
+* Barcode/QR code scanning
+* GST invoice generation
+* Voice-based inventory management
+* WhatsApp-based inventory queries
+* Sales and profit analytics
+* Cloud-based scheduled forecasting
+* Role-based access control for store employees
+
+---
+
+## 📄 License
+
+This project was developed as a **Final Year College Project** for educational and demonstration purposes.
