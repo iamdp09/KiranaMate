@@ -1,4 +1,4 @@
-# 🛒 KiranaAI — AI-Powered Inventory Management System
+# 🛒 KiranaAI — Inventory Management System
 
 > Final Year College Project | AI + Web Development
 
